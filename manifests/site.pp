@@ -71,13 +71,6 @@ puppet  IN      A       $ipaddr
   ####### razor
   class { razor: }
   
-  rz_image { $mkimage:
-    ensure  => 'present',
-    type    => 'mk',
-    source  => "http://github.com/downloads/puppetlabs/Razor/$mkimage",
-    require => Service['razor'],
-  }
-  
   ####### puppetdb
   class { puppetdb::server: }
   class { puppetdb::terminus: puppetdb_host => $hostname } 
