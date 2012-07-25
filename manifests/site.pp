@@ -1,26 +1,24 @@
 node master {
   $hostname = 'master.puppetlabs.vm'
-  $ipaddr   = '172.16.0.2'
   $hostaddr = '172.16.0.1'
-  $razv = "0.9.0.4"
-  $mkimage = "rz_mk_dev-image.$razv.iso"
+  $ipaddr   = '172.16.0.2'
 
   package { 'vim': ensure => installed, }
   
   #### DHCP 
   class { dhcp:
     dnsdomain   => [ 'localdomain' ],
-    nameservers => [ $hostaddr ],
-    ntpservers  => [ $hostaddr ],
+    nameservers => [ $ipaddr ],
+    ntpservers  => [ $ipaddr ],
     interfaces  => [ 'eth1' ],
     pxeserver   => [ $ipaddr ],
     pxefilename => 'pxelinux.0',
   }
   dhcp::pool { 'localdomain':
     network     => '172.16.0.0',
-    mask        => '255.255.0.0',
+    mask        => '255.255.255.0',
     range       => '172.16.0.100 172.16.0.200',
-    gateway     => $ipaddr,
+    gateway     => $hostaddr,
   }
   
   ### Give us sudo
@@ -65,11 +63,20 @@ node master {
 master  IN      A       $ipaddr
 puppet  IN      A       $ipaddr
 ",
+    
          require => File['/etc/bind/named.conf.local'],
          notify  => Service['bind9'],
   }
+
+  file {'/etc/bind/named.conf.options':
+      content => 'options { directory "/var/cache/bind"; dnssec-validation auto; auth-nxdomain no; listen-on-v6 { any; }; forwarders { 8.8.8.8; 8.8.4.4; }; };',
+      require => File['/etc/bind/named.conf.local'],
+      notify  => Service['bind9'],
+  }
   ####### razor
-  class { razor: }
+  class { razor: 
+      address => $ipaddr,
+  }
   
   ####### puppetdb
   class { puppetdb::server: }
@@ -106,4 +113,17 @@ puppet  IN      A       $ipaddr
     require => Package['puppetmaster'],
     force   => true,
   }
+
+  #####HACK TO SETUP IP ADDRESS IN RAZOR 
+  exec {"/bin/sed -i 's/image_svc_host: .*/image_svc_host: $ipaddr/' /opt/razor/conf/razor_server.conf ":
+      unless => "/bin/grep 'mage_svc_host: $ipaddr' /opt/razor/conf/razor_server.conf -q",
+      require => Class['razor'],
+  }
+
+  exec {"/bin/sed -i 's#mk_uri: http://.*:8026#mk_uri: http://$ipaddr:8026#' /opt/razor/conf/razor_server.conf ":
+      unless  => "/bin/grep 'mk_uri: http://$ipaddr:8026' /opt/razor/conf/razor_server.conf -q",
+      require => Class['razor'],
+  }
+
+
 }
