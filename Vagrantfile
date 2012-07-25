@@ -25,7 +25,7 @@ Vagrant::Config.run do |config|
     box_config.ssh.port = 2222
     box_config.vm.customize ["modifyvm", :id, "--name", 'agent1.puppetlabs.vm']
   end
-  
+
   config.vm.define :agent2 do |box_config|
     box_config.vm.box = 'agent2'
     box_config.vm.box_url = 'https://github.com/downloads/benburkert/bootstrap-razor/pxe-blank.box'

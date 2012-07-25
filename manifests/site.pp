@@ -4,8 +4,8 @@ node master {
   $ipaddr   = '172.16.0.2'
 
   package { 'vim': ensure => installed, }
-  
-  #### DHCP 
+
+  #### DHCP
   class { dhcp:
     dnsdomain   => [ 'localdomain' ],
     nameservers => [ $ipaddr ],
@@ -20,12 +20,12 @@ node master {
     range       => '172.16.0.100 172.16.0.200',
     gateway     => $hostaddr,
   }
-  
+
   ### Give us sudo
   sudo::conf { 'vagrant':
     content => 'vagrant ALL=(ALL) NOPASSWD: ALL',
   }
-  
+
   ### Add the puppetlabs repo
   apt::source { 'puppetlabs':
     location   => 'http://apt.puppetlabs.com',
@@ -37,22 +37,22 @@ node master {
 
   ### Add bind -- hack
   package { 'bind9':
-   ensure => 'installed'
+    ensure => 'installed'
   }
 
   service { 'bind9':
-      ensure  => 'running',
-      enable  => 'true',
-      require => Package['bind9'],
+    ensure  => 'running',
+    enable  => 'true',
+    require => Package['bind9'],
   }
 
-  file {'/etc/bind/named.conf.local':
+  file { '/etc/bind/named.conf.local':
       content => 'zone "puppetlabs.vm" { type master; file "/etc/bind/puppetlabs.vm"; };',
       require => Package['bind9'],
   }
 
-  file {'/etc/bind/puppetlabs.vm':
-       content =>  "\$TTL 604800 
+  file { '/etc/bind/puppetlabs.vm':
+       content =>  "\$TTL 604800
 @       IN      SOA     master.puppetlabs.vm   master.puppetlabs.vm. (
 2007011501
 7200
@@ -74,42 +74,42 @@ puppet  IN      A       $ipaddr
       notify  => Service['bind9'],
   }
   ####### razor
-  class { razor: 
+  class { 'razor': 
       address => $ipaddr,
   }
   
   ####### puppetdb
-  class { puppetdb::server: }
-  class { puppetdb::terminus: puppetdb_host => $hostname } 
+  class { 'puppetdb::server': }
+  class { 'puppetdb::terminus': puppetdb_host => $hostname }
 
-  exec {'/etc/init.d/puppetdb stop && /usr/sbin/puppetdb-ssl-setup && /etc/init.d/puppetdb start':
+  exec { '/etc/init.d/puppetdb stop && /usr/sbin/puppetdb-ssl-setup && /etc/init.d/puppetdb start':
       creates => '/etc/puppetdb/ssl/keystore.jks',
       require => Class['puppetdb::terminus'],
   }
-  
+
   ###### puppet
-  class { puppet: 
-  	  master                    => true, 
-	  agent                     => false,  
-	  puppet_master_package     => "puppetmaster", 
-      puppet_server             => $hostname, 
-	  storeconfigs              => true, 
-	  storeconfigs_dbadapter    => "puppetdb",
-      storeconfigs_dbserver     => $hostname,
+  class { 'puppet':
+  	master                    => true,
+	  agent                     => false,
+	  puppet_master_package     => 'puppetmaster',
+    puppet_server             => $hostname,
+	  storeconfigs              => true,
+	  storeconfigs_dbadapter    => 'puppetdb',
+    storeconfigs_dbserver     => $hostname,
   }
 
   ###links puppet to modules here
 
   file {'/etc/puppet/manifests':
     ensure  => link,
-    target  => "/tmp/vagrant-puppet/manifests",
+    target  => '/tmp/vagrant-puppet/manifests',
     require => Package['puppetmaster'],
     force   => true,
   }
 
   file {'/etc/puppet/modules':
     ensure  => link,
-    target  => "/tmp/vagrant-puppet/modules-0",
+    target  => '/tmp/vagrant-puppet/modules-0',
     require => Package['puppetmaster'],
     force   => true,
   }
