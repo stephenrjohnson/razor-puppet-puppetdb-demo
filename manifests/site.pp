@@ -47,12 +47,12 @@ node master {
   }
 
   file { '/etc/bind/named.conf.local':
-      content => 'zone "puppetlabs.vm" { type master; file "/etc/bind/puppetlabs.vm"; };',
-      require => Package['bind9'],
+    content => 'zone "puppetlabs.vm" { type master; file "/etc/bind/puppetlabs.vm"; };',
+    require => Package['bind9'],
   }
 
   file { '/etc/bind/puppetlabs.vm':
-       content =>  "\$TTL 604800
+    content =>  "\$TTL 604800
 @       IN      SOA     master.puppetlabs.vm   master.puppetlabs.vm. (
 2007011501
 7200
@@ -64,18 +64,18 @@ master  IN      A       $ipaddr
 puppet  IN      A       $ipaddr
 ",
     
-         require => File['/etc/bind/named.conf.local'],
-         notify  => Service['bind9'],
+    require => File['/etc/bind/named.conf.local'],
+    notify  => Service['bind9'],
   }
 
   file {'/etc/bind/named.conf.options':
-      content => 'options { directory "/var/cache/bind"; dnssec-validation auto; auth-nxdomain no; listen-on-v6 { any; }; forwarders { 8.8.8.8; 8.8.4.4; }; };',
-      require => File['/etc/bind/named.conf.local'],
-      notify  => Service['bind9'],
+    content => 'options { directory "/var/cache/bind"; dnssec-validation auto; auth-nxdomain no; listen-on-v6 { any; }; forwarders { 8.8.8.8; 8.8.4.4; }; };',
+    require => File['/etc/bind/named.conf.local'],
+    notify  => Service['bind9'],
   }
   ####### razor
   class { 'razor': 
-      address => $ipaddr,
+    address => $ipaddr,
   }
   
   ####### puppetdb
@@ -90,11 +90,11 @@ puppet  IN      A       $ipaddr
   ###### puppet
   class { 'puppet':
   	master                    => true,
-	  agent                     => false,
-	  puppet_master_package     => 'puppetmaster',
+	agent                     => false,
+	puppet_master_package     => 'puppetmaster',
     puppet_server             => $hostname,
-	  storeconfigs              => true,
-	  storeconfigs_dbadapter    => 'puppetdb',
+	storeconfigs              => true,
+	storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
   }
 
@@ -116,14 +116,12 @@ puppet  IN      A       $ipaddr
 
   #####HACK TO SETUP IP ADDRESS IN RAZOR 
   exec {"/bin/sed -i 's/image_svc_host: .*/image_svc_host: $ipaddr/' /opt/razor/conf/razor_server.conf ":
-      unless => "/bin/grep 'mage_svc_host: $ipaddr' /opt/razor/conf/razor_server.conf -q",
-      require => Class['razor'],
+    unless => "/bin/grep 'mage_svc_host: $ipaddr' /opt/razor/conf/razor_server.conf -q",
+    require => Class['razor'],
   }
 
   exec {"/bin/sed -i 's#mk_uri: http://.*:8026#mk_uri: http://$ipaddr:8026#' /opt/razor/conf/razor_server.conf ":
-      unless  => "/bin/grep 'mk_uri: http://$ipaddr:8026' /opt/razor/conf/razor_server.conf -q",
-      require => Class['razor'],
+    unless  => "/bin/grep 'mk_uri: http://$ipaddr:8026' /opt/razor/conf/razor_server.conf -q",
+    require => Class['razor'],
   }
-
-
 }
