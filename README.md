@@ -1,7 +1,7 @@
 Razor-vagrant-puppet-puppetdb-demo
 ==================================
 
-# Origanl Idea
+# Original Idea
 
 This demo is based on [razor-vagrant-demo] (https://github.com/benburkert/razor-vagrant-demo/).
 
