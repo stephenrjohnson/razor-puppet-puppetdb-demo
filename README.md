@@ -26,7 +26,11 @@ librarian-puppet install
 
 ## Step 4: Launch the machines
 Start the virtual machines this will take a long time the first time.
-vagrant up
+
+* For just razor
+  * cd env/razor && vagrant up
+* For razor / puppet / puppetdb
+  * cd env/full && vagrant up
 
 ## Step 5: Update puppet manifest
 The site.pp only contains information for master, update to include what you need for the clients.
