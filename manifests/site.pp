@@ -93,8 +93,8 @@ puppet  IN      A       $ipaddr
     puppet_master_package     => 'puppetmaster',
     puppet_server             => $hostname,
     autosign                  => true,
-	storeconfigs              => true,
-	storeconfigs_dbadapter    => 'puppetdb',
+    storeconfigs              => true,
+    storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
   }
 
