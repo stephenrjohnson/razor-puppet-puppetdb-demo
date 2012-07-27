@@ -92,8 +92,9 @@ puppet  IN      A       $ipaddr
     agent                     => false,
     puppet_master_package     => 'puppetmaster',
     puppet_server             => $hostname,
-    storeconfigs              => true,
-    storeconfigs_dbadapter    => 'puppetdb',
+    autosign                  => true,
+	storeconfigs              => true,
+	storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
   }
 
