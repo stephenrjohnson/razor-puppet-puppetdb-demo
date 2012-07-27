@@ -6,7 +6,7 @@ node master {
   package { 'vim': ensure => installed, }
 
   #### DHCP
-  class { dhcp:
+  class { 'dhcp':
     dnsdomain   => [ 'localdomain' ],
     nameservers => [ $ipaddr ],
     ntpservers  => [ $ipaddr ],
@@ -63,7 +63,6 @@ node master {
 master  IN      A       $ipaddr
 puppet  IN      A       $ipaddr
 ",
-    
     require => File['/etc/bind/named.conf.local'],
     notify  => Service['bind9'],
   }
@@ -74,27 +73,27 @@ puppet  IN      A       $ipaddr
     notify  => Service['bind9'],
   }
   ####### razor
-  class { 'razor': 
+  class { 'razor':
     address => $ipaddr,
   }
-  
+
   ####### puppetdb
   class { 'puppetdb::server': }
   class { 'puppetdb::terminus': puppetdb_host => $hostname }
 
   exec { '/etc/init.d/puppetdb stop && /usr/sbin/puppetdb-ssl-setup && /etc/init.d/puppetdb start':
-      creates => '/etc/puppetdb/ssl/keystore.jks',
-      require => Class['puppetdb::terminus'],
+    creates => '/etc/puppetdb/ssl/keystore.jks',
+    require => Class['puppetdb::terminus'],
   }
 
   ###### puppet
   class { 'puppet':
-  	master                    => true,
-	agent                     => false,
-	puppet_master_package     => 'puppetmaster',
+    master                    => true,
+    agent                     => false,
+    puppet_master_package     => 'puppetmaster',
     puppet_server             => $hostname,
-	storeconfigs              => true,
-	storeconfigs_dbadapter    => 'puppetdb',
+    storeconfigs              => true,
+    storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
   }
 
@@ -114,7 +113,7 @@ puppet  IN      A       $ipaddr
     force   => true,
   }
 
-  #####HACK TO SETUP IP ADDRESS IN RAZOR 
+  #####HACK TO SETUP IP ADDRESS IN RAZOR
   exec {"/bin/sed -i 's/image_svc_host: .*/image_svc_host: $ipaddr/' /opt/razor/conf/razor_server.conf ":
     unless => "/bin/grep 'mage_svc_host: $ipaddr' /opt/razor/conf/razor_server.conf -q",
     require => Class['razor'],
