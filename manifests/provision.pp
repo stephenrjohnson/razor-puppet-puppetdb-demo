@@ -89,7 +89,14 @@ puppet  IN      A       $ipaddr
   ####### razor
   class { 'razor':
     address => $ipaddr,
-    tag    => ['razor'],
+    tag     => ['razor'],
+    require => Class['tftp'], 
+  }
+  
+  ### run tftp as a service
+  class {'tftp': 
+    inetd => false,
+    tag   => ['razor'],
   }
 
   ####### puppetdb
