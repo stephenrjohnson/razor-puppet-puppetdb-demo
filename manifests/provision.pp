@@ -24,7 +24,7 @@ node master {
     mask        => '255.255.255.0',
     range       => '172.16.0.100 172.16.0.200',
     gateway     => $hostaddr,
-    tag        => ['razor','puupet'],
+    tag        => ['razor','puppet'],
   }
 
   ### Give us sudo
