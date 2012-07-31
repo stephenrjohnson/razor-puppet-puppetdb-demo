@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+env = "razor,puppet"
 Vagrant::Config.run do |config|
 
   config.vm.define :master do |box_config|
@@ -15,7 +16,7 @@ Vagrant::Config.run do |config|
 	    puppet.manifest_file = 'provision.pp'
 	    puppet.manifests_path = '../../manifests'
 	    puppet.module_path = '../../modules'
-      puppet.options = '--tags razor,puppet'
+      puppet.options = "--tags #{env}"
     end
   end
 

@@ -30,7 +30,7 @@ Start the virtual machines this will take a long time the first time.
 * For just razor
   * cd env/razor && vagrant up
 * For razor / puppet / puppetdb
-  * cd env/full && vagrant up
+  * cd env/full-noosimage && vagrant up
 
 ## Step 5: Update puppet manifest
 The provision.pp only contains information for master, create your own site.pp and include what you need for the clients.
