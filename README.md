@@ -30,6 +30,7 @@ Start the virtual machines this will take a long time the first time.
   * cd env/full-noosimage && rake setup && vagrant up
 * For razor / puppet / puppetdb and ubuntu razor policy and image
   * cd env/full-ubuntu-image && rake setup && vagrant up
+  * Root password for the newly installed machines will be "puppet"
 
 ## Step 5: Update puppet manifest
 The provision.pp only contains information for master, create your own site.pp and include what you need for the clients.
