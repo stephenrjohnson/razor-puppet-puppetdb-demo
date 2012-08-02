@@ -158,4 +158,32 @@ puppet  IN      A       $ipaddr
     require => Class['razor'],
     tag     => ['razor'],
   }
+
+  rz_image { 'precise_image':
+    ensure   => present,
+    type     => 'os',
+    version  => '12.04',
+    source   => '/tmp/images/ubuntu-12.04-server-amd64.iso',
+    tag      => ['ubuntu'],
+  }
+
+  rz_model { 'precise_model':
+    ensure      => present,
+    description => 'Ubuntu Precise Model',
+    image       => 'precise_image',
+    metadata    => {'domainname' => 'puppetlabs.lan', 'hostname_prefix' => 'openstack', 'root_password' => 'puppet'},
+    template    => 'ubuntu_precise',
+    tag         => ['ubuntu'],
+  }
+
+  rz_policy { 'precise_policy':
+    ensure   => 'present',
+    broker   => 'none',
+    model    => 'precise_model',
+    enabled  => 'true',
+    tags     => ['virtualbox_vm'],
+    template => 'linux_deploy',
+    tag      => ['ubuntu'],
+    maximum  => 10,
+  }
 }
