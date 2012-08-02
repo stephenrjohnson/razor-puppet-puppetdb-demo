@@ -1,0 +1,6 @@
+desc 'clone all required modules'
+  task :setup do
+      puts "Running setup task"
+      
+      sh %(librarian-puppet install)
+  end
