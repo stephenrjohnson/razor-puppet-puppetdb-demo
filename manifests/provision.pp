@@ -17,14 +17,14 @@ node master {
     pxeserver   => [ $ipaddr ],
     pxefilename => 'pxelinux.0',
     require     => Exec['apt_update'],
-    tag         => ['razor','puppet']
+    tag         => ['razor']
   }
   dhcp::pool { 'localdomain':
     network     => '172.16.0.0',
     mask        => '255.255.255.0',
     range       => '172.16.0.100 172.16.0.200',
     gateway     => $hostaddr,
-    tag        => ['razor','puppet'],
+    tag         => ['razor'],
   }
 
   ### Give us sudo
@@ -39,14 +39,14 @@ node master {
     repos      => 'main',
     key        => '4BD6EC30',
     key_server => 'pgp.mit.edu',
-    before     => [ Class['puppetdb::terminus'], Class['puppet'], Class['puppetdb::server'] ],
+    before     => [ Class['puppet::master'], Class['puppetdb::terminus'], Class['puppetdb::server'] ],
     tag       => ['puppet'],
   }
 
   ### Add bind -- hack
   package { 'bind9':
     ensure  => 'installed',
-    tag     => ['razor','puppet'],
+    tag     => ['razor'],
     require => Class['dhcp'],
   }
 
@@ -54,13 +54,13 @@ node master {
     ensure  => 'running',
     enable  => 'true',
     require => Package['bind9'],
-    tag    => ['razor','puppet'],
+    tag    => ['razor'],
   }
 
   file { '/etc/bind/named.conf.local':
     content => 'zone "puppetlabs.vm" { type master; file "/etc/bind/puppetlabs.vm"; };',
     require => Package['bind9'],
-    tag    => ['razor','puppet'],
+    tag     => ['razor'],
   }
 
   file { '/etc/bind/puppetlabs.vm':
@@ -77,14 +77,14 @@ puppet  IN      A       $ipaddr
 ",
     require => File['/etc/bind/named.conf.local'],
     notify  => Service['bind9'],
-    tag    => ['razor','puppet'],
+    tag     => ['razor'],
   }
 
   file {'/etc/bind/named.conf.options':
     content => 'options { directory "/var/cache/bind"; dnssec-validation auto; auth-nxdomain no; listen-on-v6 { any; }; forwarders { 8.8.8.8; 8.8.4.4; }; };',
     require => File['/etc/bind/named.conf.local'],
     notify  => Service['bind9'],
-    tag    => ['razor','puppet'],
+    tag    => ['razor'],
   }
   ####### razor
   class { 'razor':
@@ -101,41 +101,37 @@ puppet  IN      A       $ipaddr
 
   ####### puppetdb
   class { 'puppetdb::server':
-    tag        => ['puppet'],
-  }
-
-  class { 'puppetdb::terminus':
-    puppetdb_host => $hostname,
-    tag        => ['puppet'],
+    tag => ['puppet'],
   }
 
   exec { '/etc/init.d/puppetdb stop && /usr/sbin/puppetdb-ssl-setup && /etc/init.d/puppetdb start':
     creates => '/etc/puppetdb/ssl/keystore.jks',
     require => Class['puppetdb::terminus'],
-    tag    => ['puppet'],
+    tag     => ['puppet'],
   }
 
   ###### puppet
-  class { 'puppet':
-    master                    => true,
-    agent                     => false,
-    puppet_master_package     => 'puppetmaster',
+  class { 'puppet::master':
     puppet_server             => $hostname,
     autosign                  => true,
     storeconfigs              => true,
     storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
-    tag                      => ['puppet'],
+    tag                       => ['puppet'],
+  }
+
+  class { 'puppet::agent':
+    puppet_server             => $hostname,
+    tag                       => ['puppet'],
   }
 
   ###links puppet to modules here
-
   file {'/etc/puppet/manifests':
     ensure  => link,
     target  => '/tmp/vagrant-puppet/manifests',
     require => Package['puppetmaster'],
     force   => true,
-    tag    => ['puppet'],
+    tag     => ['puppet'],
   }
 
   file {'/etc/puppet/modules':
@@ -143,7 +139,7 @@ puppet  IN      A       $ipaddr
     target  => '/tmp/vagrant-puppet/modules-0',
     require => Package['puppetmaster'],
     force   => true,
-    tag    => ['puppet'],
+    tag     => ['puppet'],
   }
 
   #####HACK TO SETUP IP ADDRESS IN RAZOR
