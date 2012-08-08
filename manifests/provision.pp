@@ -39,9 +39,10 @@ node master {
     repos      => 'main',
     key        => '4BD6EC30',
     key_server => 'pgp.mit.edu',
-    before     => [ Class['puppet::master'], Class['puppetdb::terminus'], Class['puppetdb::server'] ],
     tag       => ['puppet'],
   }
+
+  Exec["apt_update"] -> Package <| |>
 
   ### Add bind -- hack
   package { 'bind9':
@@ -106,13 +107,12 @@ puppet  IN      A       $ipaddr
 
   exec { '/etc/init.d/puppetdb stop && /usr/sbin/puppetdb-ssl-setup && /etc/init.d/puppetdb start':
     creates => '/etc/puppetdb/ssl/keystore.jks',
-    require => Class['puppetdb::terminus'],
+    require => [Class['puppetdb::server'],Class['puppet::master']],
     tag     => ['puppet'],
   }
 
   ###### puppet
   class { 'puppet::master':
-    puppet_server             => $hostname,
     autosign                  => true,
     storeconfigs              => true,
     storeconfigs_dbadapter    => 'puppetdb',
