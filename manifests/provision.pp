@@ -115,7 +115,6 @@ puppet  IN      A       $ipaddr
   class { 'puppet::master':
     autosign                  => true,
     storeconfigs              => true,
-    storeconfigs_dbadapter    => 'puppetdb',
     storeconfigs_dbserver     => $hostname,
     tag                       => ['puppet'],
   }
