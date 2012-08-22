@@ -3,6 +3,7 @@ forge "http://forge.puppetlabs.com"
 mod 'puppetlabs/razor',     :git => 'https://github.com/nanliu/puppetlabs-razor.git', :ref=>'tb/resource'
 mod 'puppetlabs/dhcp',      :git => 'https://github.com/puppetlabs/puppetlabs-dhcp.git'
 mod 'saz/sudo',             :git => 'https://github.com/saz/puppet-sudo.git'
+mod 'cprice404/inifile' 
 mod 'puppetlabs/mongodb'
 mod 'puppetlabs/apt'
 mod 'puppetlabs/nodejs'
