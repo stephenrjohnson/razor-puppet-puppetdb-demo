@@ -91,11 +91,11 @@ puppet  IN      A       $ipaddr
   class { 'razor':
     address => $ipaddr,
     tag     => ['razor'],
-    require => Class['tftp'], 
+    require => Class['tftp'],
   }
-  
+
   ### run tftp as a service
-  class {'tftp': 
+  class {'tftp':
     inetd => false,
     tag   => ['razor'],
   }
@@ -166,7 +166,7 @@ puppet  IN      A       $ipaddr
     ensure      => present,
     description => 'Ubuntu Precise Model',
     image       => 'precise_image',
-    metadata    => {'domainname' => 'puppetlabs.lan', 'hostname_prefix' => 'openstack', 'root_password' => 'puppet'},
+    metadata    => {'domainname' => 'puppetlabs.lan', 'hostname_prefix' => 'vagrant', 'root_password' => 'puppetpassword'},
     template    => 'ubuntu_precise',
     tag         => ['ubuntu'],
   }
