@@ -7,6 +7,6 @@ desc 'clone all required modules'
           puts "Image file already downloaed please delete if you wish to download again"
       else
           puts "Download ubuntu install image, this may take a long time"
-          sh %("curl http://releases.ubuntu.com/12.04/ubuntu-12.04-server-amd64.iso > images/ubuntu-12.04-server-amd64.iso")
+          sh "curl http://releases.ubuntu.com/12.04.2/ubuntu-12.04.2-server-amd64.iso > images/ubuntu-12.04-server-amd64.iso"
       end
   end
