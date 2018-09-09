@@ -8,7 +8,7 @@ This demo is based on [razor-vagrant-demo] (https://github.com/benburkert/razor-
 ## Step 1: Setup
 First install virtual box
 
-Then ensure that the the extension pack is installed:
+Then ensure that the extension pack is installed:
 
  http://download.virtualbox.org/virtualbox/4.1.18/Oracle_VM_VirtualBox_Extension_Pack-4.1.18-78361.vbox-extpacks
 
